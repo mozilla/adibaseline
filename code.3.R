@@ -61,21 +61,7 @@ ladi$month <- strftime(ladi$date,"%b")
 ladi$dom <- as.integer(strftime(ladi$date,"%d"))
 ladi <- ladi[order(month,date),][ ,id:=1:.N,by=list(month)][,]
 adi <- ladi[order(month, id),]
-ladi$reldiff2=NULL
 
-ladi[,reldiff2:={
-    ty <- .SD
-    ly <- ladi[month == .BY$month & year == as.numeric(.BY$year) -1 ,]
-    if(nrow(ly)==0) {
-        NA_real_
-    } else {
-        r  = (ty$s2Adi - ly$s2Adi)/ly$s2Adi*100
-        if(length(r) > nrow(.SD) ) {
-            r <- head(r,nrow(.SD))
-        }
-        r
-    }
-},by=list(month,year)]
 
 
 ladi[,reldiff:={
@@ -107,13 +93,6 @@ ladi[,diff:={
 },by=list(month,year)]
 
 
-ladi[, sAdiCentered:={
-    sAdi / mean(sAdi)
-},by=list(month,year)]
-
-## ladi[, adiSeas:= decompose(ts(ladi$adi,frequ=365.25), "multiplicative")$seasonal]
-#ladi[, adiSeas:=stl(log(tx), s.window='periodic')$time.series[,'seasonal']]
-
 fit=stl(ts(ladi$adi/1e6,frequency=12),s.window=12)
 ladi[, seasonal:=fit$time.series[,"seasonal"]]
 library(feather)
@@ -122,3 +101,15 @@ ladi[, date:=as.character(date)]
 write_feather(alldiall,"./web/alldiall.feather")
 write_feather(ladi,"./web/ladi.feather")
 
+### Get CSV for Shraddha
+## adi For Firefox
+adiAcrossYears = ladi[, list(date=date,year=year,dayOfYear=doy,smoothed14ADI=sAdi
+                             ,reldiffYoYpct=reldiff,diffYoYmm=diff)][order(date),]
+
+### Compare smoothedADI from versions
+## adi is for Firefox and v>42
+dailyUsageCompare=alldiall[, list(date=date,year=year,dayOfyear=doy,dauActivityDate=sDauAc,dauSubmissionDate=sDauSub,
+                                  smoothed14ADI=sAdi)][order(date),]
+
+write.csv(adiAcrossYears,"/tmp/adiAcrossYears.csv")
+write.csv(dailyUsageCompare,"/tmp/dailyUsageCompare.csv")

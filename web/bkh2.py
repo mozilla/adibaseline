@@ -276,11 +276,6 @@ cyc1 = Cycle("sAdi", tooltips=[
         ("Year Over Year Diff", "@delta")
 ])
 
-# cyc3 = Cycle("sAdiCentered", tooltips=[
-#         ("date","@date"),
-#         ("14 day smoothed centered ADI(mm)","@adi")
-# ])
-
 def reldiffFunctor (p, cds):
     zeroline = Span(location=0,
                     dimension='width', line_color='red',

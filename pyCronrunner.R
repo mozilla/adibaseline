@@ -3,20 +3,8 @@
 ################################################################################
 source("~/prefix.R")
 setwd("~/mz/baselinesForDAU_forPeter/")
-library(mozaws)
-islocaltolaptopq <-   grepl("darwin",R.version['platform'])
-spark.rhipe <- function(cl){
-    cl  <- aws.step.run(cl, script=sprintf('s3://%s/run.user.script.sh',aws.options()$s3bucket)
-                      , args="https://raw.githubusercontent.com/saptarshiguha/mozaws/master/bootscriptsAndR/setupRhipe.sh"
-                      , name="Install RHIPE"
-                      , wait=60)
-}
-spark.init <- function(cl){
-    cl  <- aws.step.run(cl, script=sprintf('s3://%s/run.user.script.sh',aws.options()$s3bucket)
-                      , args="https://raw.githubusercontent.com/saptarshiguha/mozillametricstools/master/common/spark.init.step.sh"
-                      , name="Clone Our Repo"
-                      , wait=60)
-}
+source("~/mz/spark.creator.R")
+
 
 .Last <- function(){
     tryCatch(aws.kill(runOb$cl()),error=function(e) NULL)
@@ -26,20 +14,6 @@ spark.init <- function(cl){
 
 isn <- function(a,r=NA) if( length(a)==0 || is.null(a)) r else a
 CL <- NULL
-
-
-## ##############################################################################
-## Initialize
-## ##############################################################################
-aws.init(ec2key="20161025-dataops-dev"
-        ,localpubkey = "~/mz/awsssh.pub"
-        ,opts = list(loguri    = "s3://mozilla-metrics/share/logs/"
-                    ,s3bucket  = "mozilla-metrics/share/bootscriptsAndR"
-                    ,timeout   = as.character(as.integer(5*60))
-                    ,ec2attributes = "InstanceProfile='telemetry-spark-cloudformation-TelemetrySparkInstanceProfile-1SATUBVEXG7E3'"
-                    ,configfile ="https://s3-us-west-2.amazonaws.com/telemetry-spark-emr-2/configuration/configuration.json"
-                     ))
-invisible(aws.options(releaselabel="emr-5.4.0"))
 
 
 makePyRunner <- function(ProjName, URL,NumNodes=10, Spot=0.8,cl=NULL){
@@ -71,7 +45,7 @@ exit 0
         cat(sprintf("Uploading %s to s3://mozilla-metrics/user/sguha/tmp/runXPDB%s.sh",x,JNAME))
         system(sprintf("aws s3 cp %s  s3://mozilla-metrics/user/sguha/tmp/runXPDB%s.sh",x,JNAME))
         if(is.null(cl)){
-            cl <- aws.clus.create(workers=1,spark=TRUE,ver=TRUE,applications=c("Spark","Hive","Hadoop"),name = JNAME,wait=30)
+            cl <- spark.make.moz.clus(name=JNAME, wait=30)
             CL <<- cl
             if(!identical("WAITING",cl$Status$State)){
                 quit(save='yes')
@@ -80,7 +54,7 @@ exit 0
             ## Grow Cluster, Add R packages etc
             ## ##############################################################################
             cat("Running the Step to add mozillametricstools code\n")
-            spark.init(cl);spark.rhipe(cl);
+            mozilla.init(cl)
             cl <- aws.modify.groups(cl, NNODES, spot = SPOT)
             while(TRUE){
                 cl <- aws.clus.info(cl)
