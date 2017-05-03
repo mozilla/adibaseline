@@ -116,7 +116,7 @@ exit 0
 cl <- NULL
 runOb <- makePyRunner(
     ProjName = 'FXBASELINE',
-    URL = 'https://gist.githubusercontent.com/saptarshiguha/2263ee339c51395858a5290ec7bfa209/raw/cd5cd658adfa497f44f1deff2e01c06fdf891afc/css_classes.py'
+    URL = 'https://gist.githubusercontent.com/saptarshiguha/103231c476302f922e7e558244e57e7c/raw/8f647f46c619f8ab70eceb77cd3ce6a515556d87/code.1.py'
     ,NumNode=35,Spot=0.8,cl=cl)
 
 runOb$init()
