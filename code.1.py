@@ -11,7 +11,7 @@ import pandas as pd
 
 useALL = True
 
-ms = sqlContext.read.load("s3://telemetry-parquet/main_summary/v3", "parquet",mergeSchema=True)
+ms = sqlContext.read.load("s3://telemetry-parquet/main_summary/v4", "parquet",mergeSchema=True)
 ms2 = ms.select("sample_id","client_id","submission_date_s3","country","subsession_start_date")
 if useALL:
     ms3 = ms2.filter("app_name='Firefox'")
