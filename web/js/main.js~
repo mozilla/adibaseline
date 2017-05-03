@@ -1,0 +1,321 @@
+'use strict'
+Array.max = function( array ){
+    return Math.max.apply( Math, array );
+};
+
+Array.min = function( array ){
+    return Math.min.apply( Math, array );
+};
+
+var myconfigs = {}
+myconfigs.panelWidth = 320;
+myconfigs.panelHeight = 240;
+myconfigs.usageWidth = 280;
+myconfigs.usageHeight = 24;
+
+myconfigs.g = function(X){
+    if(X<1) {
+	return( "<1%")
+    }else{
+	return(X+"%")
+    }
+}
+
+function getSorted(arr, sortArr) {
+    var result = [];
+    for(var i=0; i<arr.length; i++) {
+	result[i] = arr[sortArr[i]];
+    }
+    return result;
+}
+
+function drawAllData(xdata,mcpjson,yrange, xlim,usageData,first){
+    for(var i=0;i<mcpjson.length;i++) {
+	var whichkey = mcpjson[i][1];
+	var xd = xdata[ whichkey ];
+	// var usage = usageData[xdata[i].key];
+	if(whichkey=="42"){
+	    $('#description #cpexample').text(mcpjson[i][0]+"%");
+	}
+	if(i==1){
+	    $('#description #cpadi').text(mcpjson[i][3]+" mm");
+	}
+	if(first==1){
+            $('#torso').append("<div id='vcontainer" + whichkey + "'></div>")
+	    $('#vcontainer' + whichkey).addClass("row col-lg-4")
+            $('#vcontainer'+whichkey).append("<div class='vchart'></div>")
+	    $('#vcontainer' + whichkey+ " .vchart").addClass("col-lg-12")
+	}
+        var param = {
+	    title: whichkey+" ("+mcpjson[i][2]+" mm, "+mcpjson[i][0]+"%)",
+	    description: "",
+	    data: xd,
+	    small_text: true,
+	    width: myconfigs.panelWidth,
+	    height: myconfigs.panelHeight,
+	    xax_count: 5,
+	    xax_tick: 0,
+	    left: 35,
+	    top: 20,
+	    min_x: xlim,
+	    right: 0,
+	    format: "perc",
+	    show_years: false,
+	    y_extended_ticks: true,
+	    target: '#vcontainer' + whichkey+ " .vchart",
+	    x_accessor: 'date',
+	    y_accessor: 'adip'
+	    ,bottom:13
+	    // y_label: '%'
+        }
+	if(yrange != null){
+	    // param.yax_count=10
+	    param.min_y = yrange[0]
+	    param.max_y = yrange[1]
+	}
+	moz_chart(param)
+	if(first==1){
+	    $('#vcontainer'+whichkey).append("<div class='vusage'></div>")
+	    $('#vcontainer' + whichkey+ " .vusage").addClass("col-xs-12")
+	    var svgContainer = d3.select('#vcontainer' + whichkey+ " .vusage")
+		.append("svg").attr("width", myconfigs.usageWidth).attr("height",myconfigs.usageHeight).style("margin-left","30px");
+	    
+	    // if(false) { //(usage===undefined)){
+	    // 	var yscale = d3.scale.linear().domain([0,1]).range([0,myconfigs.usageHeight]);
+	    // 	var xscale = d3.scale.linear().domain([0,1]).range([0,myconfigs.usageWidth]);		
+	    // 	var colors={'1':'#FF6961','2':'#03C03C', '3':'#FDFD96', '4':'#FFB347','5':'#CB99C9'}
+	    // 	var grplabels={'1':'Lapsed','2':'Occasional', '3':'Light', '4':'Medium','5':'Heavy'}
+	    // 	var mydata = []
+	    // 	for( var kk = 5; kk>=1;kk--){
+	    // 	    var u5 = usage[kk]
+	    // 	    var lab =  grplabels[kk]+" profiles contribute "+myconfigs.g(Math.round(100*(u5.endn - u5.startn),2)) +" to version "+xdata[i].key+" population and "+Math.round(100*(u5.endh - u5.starth),2)+"% to the versions total usage hours" 
+	    // 	    mydata.push( {'x': u5.startn, 'y': 0, 'height':0.5, 'width': u5.endn - u5.startn
+	    // 			  ,'label': lab, 'color': colors[kk], 'group': kk,'ver':xdata[i].key, 'type':'n'}) // push the pop %
+	    // 	    mydata.push( {'x': u5.starth, 'y': 0.5, 'height':0.5, 'width': u5.endh - u5.starth,'label':lab,'color':colors[kk], 'group':kk , 'ver':xdata[i].key, 'type':'h'} ) //push the hour %
+	    // 	}
+	    // 	svgContainer.selectAll("rect")
+	    // 	    .data(mydata)    
+	    // 	    .enter().append("rect")
+	    // 	    .attr("x",function(d) {return xscale(d.x);})
+	    // 	    .attr("y",function(d) {return yscale(d.y);})
+	    // 	    .attr("height",function(d) {return yscale(d.height);})
+	    // 	    .attr("width",function(d) {return xscale(d.width);})
+	    // 	    .attr("fill", function(d) {return d.color;})
+	    // 	    .attr("stroke","grey")
+	    // 	    .attr("stroke-width",1)
+	    // 	    .attr("data-content",function(d){return d.label})
+	    // 	    .attr("class",function(d) { return("pn"+d.group)}) //
+	    // 	    .on('mouseover', function(d){
+	    // 	    	d3.select("#vcontainer"+d.ver+ " .vusage").selectAll("rect").style("fill","#eeeeee");
+	    // 	    	d3.selectAll("#vcontainer"+d.ver+ " .vusage .pn"+d.group).style("fill",d.color)
+	    // 	    	// tip.show(d)
+	    // 	    })
+	    // 	    .on('mouseout', function(d,idx){
+	    // 	    	d3.select("#vcontainer"+d.ver+ " .vusage").selectAll("rect").style("fill",function(d) {return(d.color)});
+	    // 	    	// tip.hide(d)
+	    // 	})
+	    // 	$("#vcontainer"+xdata[i].key+ " .vusage rect").popover({
+	    // 	    'trigger':'hover'
+	    // 	    ,'container': 'body'
+	    // 	    ,'placement': 'top'
+	    // 	    ,'white-space': 'nowrap'
+	    // 	    ,'html':'true'
+	    // 	});
+	    // }
+	}
+    }
+}
+
+$(document).ready(function() {
+    var hash = window.location.hash;
+    hash && $('ul.nav a[href="' + hash + '"]').tab('show');
+    assignEventListeners();
+    var version_adi = {};
+    $('[data-toggle="popover"]').popover({
+    trigger: 'hover',
+        'placement': 'top'
+    });
+    d3.json("data/adicp.json",function(jsonerror, cpjson){
+	d3.json("data/adicp.json", function(jsonerror2, usagejson){
+	    d3.csv("data/adipercent.csv")
+            .row(function(d) {
+		//parse csv file
+		return {date: d.date, adip: d.adip, vn: d.vn};
+            })
+            .get(function(error, rows) {
+		//prepare data array, split by version
+		for(var i=0;i<rows.length;i++) {
+                    if(version_adi[rows[i].vn] == undefined)
+			version_adi[rows[i].vn] = [];
+
+                    version_adi[rows[i].vn].push(
+			{date: rows[i].date, adip: rows[i].adip/100});
+		}
+		usagejson = null;
+		//object to array
+		var data = d3.entries(version_adi);
+		for(var i=0;i<data.length;i++){
+		    data[i].value = convert_dates(data[i].value);
+		}
+		
+                // We need 
+		//create charts
+		var checked=true;
+		var ylimrange = [];
+		var ylim = [];
+		var xlim = [];
+		var data2 = {};
+		for(var i=0;i<data.length;i++){
+		    data2[ data[i].key ] = data[i].value;
+		    for(var j=0;j<data[i].value.length;j++){
+			ylim.push(data[i].value[j].adip)
+			xlim.push(data[i].value[j].date)
+		    }
+		}
+		// there are simpler ways to do this, without using arrays
+		// dont judge
+		ylimrange[0] = Array.min(ylim);
+		ylimrange[1] = Array.max(ylim);
+		xlim = Array.min(xlim);
+
+
+		    
+		drawAllData(data2,cpjson,ylimrange,xlim,usagejson,1)
+		    
+		    
+		$("#commonyscale").click(function(e){
+		    if(checked) {checked=false} else {checked=true};
+		    if(checked){
+			drawAllData(data2,cpjson,ylimrange,xlim,usagejson,0);
+		    }else{
+			drawAllData(data2,cpjson, null,xlim,usagejson,0);
+		    }
+		})
+
+		d3.json("data/growth.json",function(error3,growthjson){
+		    $('#description #whichcurrent').text(growthjson['current'])
+		    var versiondata = growthjson['versions']
+		    $('#adoption').append("<div id='curve'></div>")
+		    $('.version-btns span.title')
+			.html("<strong>None</strong>");
+		    var markers = [{
+			'x': 7,
+			'label': 'Unthrottled'
+		    }];
+		    var mz = moz_chart({
+		    	title: "Adoption Curve",
+		    	description: "",
+		    	area: false,
+		    	data: versiondata,
+		    	small_text: false,
+		    	width: 900,
+		    	height: 600,
+		    	format: "perc",
+			min_y:0,
+			max_y:0.80,
+		    	left: 100,
+		    	bottom: 100,
+			markers:markers,
+		    	y_extended_ticks: true,
+		    	xax_count: 10,
+		    	yax_count: 10,
+		    	target: '#curve',
+		    	rollover_callback: function(d,i) {
+		    	    $('div#curve  svg .active_datapoint').html("By day "+d.x+", version "+d.ver+" reached "+Math.round(100*d.y*100)/100+"% of ADI")
+		    	},
+		    	xax_format: function(f) {
+		    	    return f;
+		    	},
+			show_confidence_band: ['lcl', 'ucl'],
+		    	x_label: 'Days Since Release',
+		    	y_label: '% of ADI on Version',
+		    	x_accessor: 'x',
+		    	y_accessor: 'y'
+		    })
+		    $('div.version-btns ul.dropdown-menu').append('<li><a data-key="' + -1 + '">'
+								  + "None" + '</a></li>');
+		    var currentn =0
+		    for(var i=versiondata.length-1; i>=0;i--){			
+		    	var ii = i+1
+			var ss = " ... on "
+			if(ii==versiondata.length-1){
+			    ss = " released on "
+			}
+			if(versiondata[i][0]['ver']!="fitted" && versiondata[i][0]['ver']!=growthjson['current'])
+			    $('div.version-btns ul.dropdown-menu').append('<li><a  data-key="' + i + '" id="b'+versiondata[i][0]['ver']+ '">'
+									  + versiondata[i][0]['ver'] + ss+versiondata[i][0]['release']+ '</a></li>');
+		    	if(versiondata[i][0]['ver']==growthjson['current']){
+			    currentn = ii
+		    	}
+		    }
+		    d3.select("#curve svg").selectAll("rect").on("click", function(d) {
+			var ver = d['ver']
+			if(ver !='fitted' &&  ver != growthjson['current'] ){
+			    $('.version-btns  .dropdown-menu li #b'+ver).trigger("click",true)
+			}
+		    })
+		    d3.select("#curve svg").selectAll("path").style({'stroke':'#dddddd'})
+		    d3.select("#curve svg").selectAll("circle").style({'fill':'black'})
+		    d3.select("#curve svg").selectAll("path.main-line.line1-color").style({'stroke':'#000000', 'stroke-width':"2px"})
+		    d3.select("#curve svg").selectAll("path.main-line.line"+currentn+"-color").style({'stroke':'#ff0000', 'stroke-width':"2px"})
+
+		    
+		    $('.version-btns  .dropdown-menu li a').on('click', function(e,fromwhere) {
+			var oldone = $(this).parent().parent().data('current')
+			if(!(oldone === undefined)){
+			    var oldline = $("#curve .main-line.line"+(oldone+1)+"-color")
+			    oldline.css("stroke-width","1px")
+			    oldline.css("stroke","#dddddd")
+			}
+			var which = $(this).data('key');
+			if(which !=0){
+			    var thisline = $("#curve .main-line.line"+(which+1)+"-color")
+			    thisline.css("stroke","#FAB30F")
+			    thisline.css("stroke-width","2px")
+			    $(this).parent().parent().data('current',which)
+			}else{
+			    $(this).parent().parent().data('current',undefined)
+			}
+			var ff = $(this).text()
+			if(ff!=undefined && ff!="None"){
+			    ff=ff.replace("released","(released")
+			    ff=ff.replace("...","(released")+")"
+			}
+			$(this).parent()
+			    .parent()
+			    .parent()
+			    .find('button.btn span.title')
+			    .html("<strong>"+ff+"</strong>");
+			if(fromwhere == undefined){
+			    if($('div#curve  svg .active_datapoint').text()!="")
+				$('div#curve  svg .active_datapoint').html("Move the mouse over the graph to refresh")
+			    d3.select("#curve svg").selectAll(".line_rollover_circle").style({"opacity":0})
+			}
+			return true;
+		    })
+		    
+		})
+		
+	    }); // end of inner read csv
+	}) // end of json usage
+    }) //end of adicp json
+})
+function setURLBar(){
+    $('#groupTab a').click(function (e) {
+	if($(this).parent('li').hasClass('active')){
+	}
+	else {
+	    console.log("foo")
+	    e.preventDefault();
+	    $(this).tab('show');
+	    var scrollmem = $('body').scrollTop();
+	    window.location.hash = this.hash;
+	    $('html,body').scrollTop(scrollmem);
+	}
+    })
+
+    
+}
+function assignEventListeners() {
+    setURLBar()
+}

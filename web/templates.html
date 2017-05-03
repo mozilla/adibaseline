@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv='content-type' content='text/html; charset=utf-8' />
+    <!-- Latest compiled and minified CSS -->
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,300,700' 
+          rel='stylesheet' type='text/css'>
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" 
+          rel="stylesheet">
+    <link rel="stylesheet" href="./css/bootstrap.min.css"  crossorigin="anonymous">
+    <link rel="stylesheet" href="./css/metrics-graphics.css"  crossorigin="anonymous">
+    <link rel="stylesheet" href="./css/adi.css"  crossorigin="anonymous">
+
+    
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="./css/bootstrap-theme.min.css" crossorigin="anonymous">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="./js/bootstrap.min.js" crossorigin="anonymous"></script>
+
+    <link href="https://cdn.pydata.org/bokeh/release/bokeh-0.12.4.min.css" rel="stylesheet" type="text/css">
+    <link href="https://cdn.pydata.org/bokeh/release/bokeh-widgets-0.12.4.min.css" rel="stylesheet" type="text/css">
+    <script src="https://cdn.pydata.org/bokeh/release/bokeh-0.12.4.min.js"></script>
+    <script src="https://cdn.pydata.org/bokeh/release/bokeh-widgets-0.12.4.min.js"></script>
+    
+    <title>Baselines for Daily Usage</title>
+
+    {{ plot_script|indent(4)|safe }}
+
+  </head>
+  <body>
+    <div id="container"  class="container">
+      <div id='content-body'>
+        <div id="description" >
+          <h2> Introduction </h2>
+            <h4>Using Blocklist Ping: ADI</h4>
+            <p>
+              One OKR for Firefox Desktop is reaching 8mm extra daily usage. The outstanding question was: <i> how will this be measured?</i>.
+              This can be further decomposed as a) what measure to use b)
+              computed over what time frame c) how to quantify 'extra'?
+
+            <p>              
+            If you look at <a href="#yoy">Year over Year</a> time series plots(14 day smoothed averages) below, daily usage based on <code>submission_date</code>, <code>subsession_start_date</code>, and ADI (based on <code>blocklist_ping</code>) have the same shape, troughs,and peaks. Moreover, the delta between ADI and daily usage based on <code>submission_date</code> is very small (typically 3%): goals based on <code>submission_date</code> could reliably and accurately translated to ADI.
+            </p>
+            
+            <p>The 8mm is a 'This Year' vs 'Last Year' comparison computed some time towards the end of the year. Moreover we need to see through the year whether we are on target. Because Unified Telemetry (UT) becamse stable mid of 2016, we don't have a last year comparison for it. Nor do we have much historical context for seasonal cycles/trends present in daily usage. Thus we used ADI (and the graphs in  <a href="#yoy">Year over Year</a>  support its usage).
+            </p>
+
+            <h4>Cycle Plots to Account for Seasonality </h4>
+            <p>
+              The idea behind the Cycle Plot is to study the data for a temporal unit of seasonality over time. For example in the  <a href="#yoy">Year over Year</a> plots,
+              it is difficult to see January data over time. The Cycle
+              Plot allows for such comparisons.
+
+
+            </p>
+
+            
+            <p>
+              In the original paper, the authors worked with 'seasonal components', instead we will work with the actual values. In the tab <i>14 Day Smoothed ADI</i>,
+              we have plotted all January ADI in one panel (bottom
+              left), all February data in the next one and so on. Each
+              color corresponds to a year, 2014,..., 2017 (from left
+              to right). The circles present in a year is the monthly
+              average. We see the overall pattern of a month across
+              years (as assesed by the circle) and the behavior of the
+              monthly subseries (all affected by the same seasonality
+              since they are in the same month). Also since the months share the same y-axis, it is easy to compare the monthly effects.
+              <b>Hovering</b> over the lines will reveal the actual values, differences and relative differences between this year and last year.
+            
+
+              <ul>
+                <li> Jan and December have largest range</li>
+                <li> Jan to March have the highest average monthly ADI and it falls after that</li>
+                <li> We have dropping steadily every year, but the relative difference YoY is decreasing (but not zero) (<i>14 Day Smoothed Yoy Change</i>)></li>
+                <li> Seasonality is different for different months, but the nature of it hasnt changed across years </li>
+                <ul>
+                  <li> smoothed ADI for Feb - Jun is faily stagnant, after which it drops aross Jul and then begins to increase till Sep and remains stable till Dec</li>
+                </ul>
+              </ul>
+            </p>
+
+            <p style="font-size: 60%;"> This graph is updated every day. The data is as of {{ date_computed }}.</p>
+        </div>
+        <h2> Daily Usage Cycle Plots</h2>
+        <a name="cyc"></a>
+      <div class="row row-centered ">
+        <div class="col-lg-10 col-md-8 col-xs-12  col-sm-12 col-centered">
+          {{ plot_cyctab }}
+          <div id="'descriptions">
+            <p>
+              I was introduced to Cycle Plots in <i>Elements of Graphing Data</i> and <i>Visualizing Data</i> both by William S. Cleveland. An easy introduction to cycle
+              plots can be found <a href="https://www.perceptualedge.com/articles/guests/intro_to_cycle_plots.pdf">here</a>. It was first introduced by W.S Cleveland, I.J Terpenning in the paper <i>Graphical Methods for Seasonal Adjustment</i> (JASA, vol 77,1982).
+            </p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="row row-centered ">
+        <div class="col-lg-10 col-md-8 col-xs-12  col-sm-12 col-centered">
+          <a name="yoy"></a>
+          <h2> Comparison between Different Measuring Schemes</h2>
+          {{ plot_yoy }}
+        </div>
+      </div>
+
+
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,51 @@
+#torso div {
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+#head ul {
+    padding-left: 16px;
+    padding-top: 10px;
+}
+
+#description {
+    width:100%;
+    font-size:14px;
+    margin-bottom:0px;
+    /* width:75%; */
+}
+
+h2.chart_title {
+    margin-left: 70px;
+}
+
+.x-axis .label,
+.y-axis .label {
+    font-size: 10.5px;
+    font-style: normal;
+}
+.y-axis text {
+   font-size: 10.5px;
+}
+h2.chart_title {
+    cursor: auto;
+    font-size: 18px;
+}
+
+#yscalediv {
+    text-align:center;
+}
+
+.x-axis .label,
+.y-axis .label {
+    font-weight: normal;
+    text-transform: none;
+    font-size:14px;
+    font-family: 'Open Sans', sans-serif, Arial;
+}
+
+
+.confidence-band {
+    fill: #00d;
+    opacity: 0.1;
+}
