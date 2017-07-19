@@ -116,7 +116,7 @@ exit 0
 cl <- NULL
 runOb <- makePyRunner(
     ProjName = 'FXBASELINE',
-    URL = 'https://gist.githubusercontent.com/saptarshiguha/103231c476302f922e7e558244e57e7c/raw/8f647f46c619f8ab70eceb77cd3ce6a515556d87/code.1.py'
+    URL='https://gist.githubusercontent.com/saptarshiguha/f2d154a84dfc08402bde14e3f0537d74/raw/82cc6865868d7350094568dfcc313cfddc13e962/code.1.py'
     ,NumNode=35,Spot=0.8,cl=cl)
 
 runOb$init()
@@ -133,6 +133,9 @@ runOb$copyLogs()
 ## system("cp code.2.html /tmp/AverageDAU_WoW.html && scp /tmp/AverageDAU_WoW.html db1:~/protected/sguha/")
 source("./code.3.R")
 system("cd web && python bkh2.py")
-system("cd web && scp index.html db1:~/protected/sguha/adibaseline/")
+##system("cd web && scp index.html db1:~/protected/sguha/adibaseline/")
+system(sprintf("cp web/index.html  /home/sguha/syncfolder/"))
+system("/home/sguha/s3sync.sh")
+
 tryCatch(aws.kill(runOb$cl()),error=function(e) NULL)
 tryCatch(aws.kill(CL),error=function(e) NULL)
