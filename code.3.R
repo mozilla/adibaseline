@@ -22,8 +22,8 @@ ladi <- data.table(d$q(sprintf("select
 save(ladi,adi,file="/tmp/adi")
 
 
-system('aws s3 cp s3://mozilla-metrics/sguha/tmp/dauActivity.csv /tmp/')
-system('aws s3 cp s3://mozilla-metrics/sguha/tmp/dauSubmission.csv /tmp/')
+system('aws s3 cp s3://mozilla-metrics/user/sguha/tmp/dauActivity.csv /tmp/')
+system('aws s3 cp s3://mozilla-metrics/user/sguha/tmp/dauSubmission.csv /tmp/')
 
 dsu <- fread("/tmp/dauSubmission.csv")[, V1:=NULL][dauSubmission>100,][, date:=as.Date(as.character(date),"%Y%m%d")]
 dac <- fread("/tmp/dauActivity.csv")[, V1:=NULL][dauActivity>100,][, date:=as.Date(as.character(date),"%Y-%m-%d")]
